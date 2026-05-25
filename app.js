@@ -87,24 +87,30 @@ function makePlaceholder() {
   return d;
 }
 
+async function safeJson(res) {
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { throw new Error(text.slice(0, 200)); }
+}
+
 async function loadNfts() {
   try {
     const res = await fetch('/api/nfts');
-    const nfts = await res.json();
+    const data = await safeJson(res);
+    if (!res.ok) throw new Error(data.error || res.statusText);
 
     // Remove old cards, keep empty state
     grid.querySelectorAll('.nft-card').forEach(c => c.remove());
 
-    if (nfts.length === 0) {
+    if (data.length === 0) {
       emptyState.classList.remove('hidden');
     } else {
       emptyState.classList.add('hidden');
-      nfts.forEach(nft => grid.appendChild(renderCard(nft)));
+      data.forEach(nft => grid.appendChild(renderCard(nft)));
     }
 
     statusText.textContent = `Last refreshed: ${new Date().toLocaleTimeString()}`;
   } catch (err) {
-    statusText.textContent = 'Could not load NFTs.';
+    statusText.textContent = `Error: ${err.message}`;
   }
 }
 
@@ -120,8 +126,7 @@ addForm.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: urlInput.value }),
     });
-    const data = await res.json();
-
+    const data = await safeJson(res);
     if (!res.ok) throw new Error(data.error || 'Failed to add NFT');
 
     urlInput.value = '';
