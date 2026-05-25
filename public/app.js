@@ -1,0 +1,183 @@
+const grid = document.getElementById('nft-grid');
+const emptyState = document.getElementById('empty-state');
+const addForm = document.getElementById('add-form');
+const urlInput = document.getElementById('url-input');
+const addBtn = document.getElementById('add-btn');
+const addError = document.getElementById('add-error');
+const refreshBtn = document.getElementById('refresh-btn');
+const statusText = document.getElementById('status-text');
+
+function timeAgo(dateStr) {
+  if (!dateStr) return 'Never';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function formatOffer(value) {
+  if (!value || value === 0) return '0';
+  if (value < 0.001) return value.toFixed(6);
+  if (value < 1) return value.toFixed(4);
+  return value.toFixed(3);
+}
+
+function renderCard(nft) {
+  const card = document.createElement('div');
+  card.className = 'nft-card';
+  card.dataset.id = nft.id;
+
+  const offerNum = nft.current_highest_offer || 0;
+  const offerClass = offerNum === 0 ? 'offer-value zero' : 'offer-value';
+  const hasAlert = nft.alert_threshold != null && nft.alert_threshold !== '';
+  const alertActive = hasAlert && offerNum >= nft.alert_threshold;
+
+  card.innerHTML = `
+    ${nft.image_url
+      ? `<img class="card-image" src="${escHtml(nft.image_url)}" alt="${escHtml(nft.name || '')}" loading="lazy" onerror="this.replaceWith(makePlaceholder())">`
+      : `<div class="card-image-placeholder">🖼️</div>`
+    }
+    <div class="card-body">
+      <div>
+        <div class="card-name" title="${escHtml(nft.name || '')}">${escHtml(nft.name || `#${nft.token_id}`)}</div>
+        ${nft.collection_name ? `<div class="card-collection">${escHtml(nft.collection_name)}</div>` : ''}
+      </div>
+
+      <div class="card-offer">
+        <span class="${offerClass}">${formatOffer(offerNum)}</span>
+        <span class="offer-currency">${escHtml(nft.offer_currency || 'ETH')}</span>
+      </div>
+
+      <div class="card-updated">Last checked: ${timeAgo(nft.last_fetched)}</div>
+
+      <div class="alert-row">
+        <span class="alert-label">Alert at:</span>
+        <input
+          type="number"
+          class="alert-input"
+          placeholder="e.g. 0.5"
+          min="0"
+          step="any"
+          value="${hasAlert ? nft.alert_threshold : ''}"
+          data-id="${nft.id}"
+        />
+        <button class="alert-save-btn" data-id="${nft.id}">Save</button>
+      </div>
+
+      ${alertActive ? `<div class="alert-active">⚡ Offer exceeds your threshold</div>` : ''}
+
+      <button class="remove-btn" data-id="${nft.id}">Remove</button>
+    </div>
+  `;
+
+  return card;
+}
+
+function escHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function makePlaceholder() {
+  const d = document.createElement('div');
+  d.className = 'card-image-placeholder';
+  d.textContent = '🖼️';
+  return d;
+}
+
+async function loadNfts() {
+  try {
+    const res = await fetch('/api/nfts');
+    const nfts = await res.json();
+
+    // Remove old cards, keep empty state
+    grid.querySelectorAll('.nft-card').forEach(c => c.remove());
+
+    if (nfts.length === 0) {
+      emptyState.classList.remove('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+      nfts.forEach(nft => grid.appendChild(renderCard(nft)));
+    }
+
+    statusText.textContent = `Last refreshed: ${new Date().toLocaleTimeString()}`;
+  } catch (err) {
+    statusText.textContent = 'Could not load NFTs.';
+  }
+}
+
+addForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  addError.classList.add('hidden');
+  addBtn.disabled = true;
+  addBtn.textContent = 'Adding...';
+
+  try {
+    const res = await fetch('/api/nfts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: urlInput.value }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Failed to add NFT');
+
+    urlInput.value = '';
+    await loadNfts();
+  } catch (err) {
+    addError.textContent = err.message;
+    addError.classList.remove('hidden');
+  } finally {
+    addBtn.disabled = false;
+    addBtn.textContent = 'Track NFT';
+  }
+});
+
+refreshBtn.addEventListener('click', async () => {
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = 'Refreshing...';
+  statusText.textContent = 'Polling OpenSea...';
+
+  try {
+    await fetch('/api/nfts/refresh', { method: 'POST' });
+    // Give the server a moment to update, then reload
+    setTimeout(loadNfts, 3000);
+  } finally {
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = 'Refresh Now';
+  }
+});
+
+grid.addEventListener('click', async (e) => {
+  // Remove button
+  if (e.target.classList.contains('remove-btn')) {
+    const id = e.target.dataset.id;
+    if (!confirm('Remove this NFT from tracking?')) return;
+    await fetch(`/api/nfts/${id}`, { method: 'DELETE' });
+    await loadNfts();
+  }
+
+  // Save alert threshold
+  if (e.target.classList.contains('alert-save-btn')) {
+    const id = e.target.dataset.id;
+    const input = grid.querySelector(`.alert-input[data-id="${id}"]`);
+    const threshold = input.value === '' ? null : parseFloat(input.value);
+
+    await fetch(`/api/nfts/${id}/alert`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ threshold }),
+    });
+
+    e.target.textContent = 'Saved!';
+    setTimeout(() => { e.target.textContent = 'Save'; }, 1500);
+  }
+});
+
+// Auto-refresh display every 60 seconds
+setInterval(loadNfts, 60_000);
+
+// Initial load
+loadNfts();

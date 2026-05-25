@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFT Offer Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>NFT Offer Tracker</h1>
+    <p class="subtitle">Monitors highest offers every 15 minutes via OpenSea</p>
+  </header>
+
+  <main>
+    <section class="add-section">
+      <form id="add-form">
+        <input
+          type="url"
+          id="url-input"
+          placeholder="Paste OpenSea NFT URL — e.g. https://opensea.io/assets/ethereum/0x.../123"
+          required
+        />
+        <button type="submit" id="add-btn">Track NFT</button>
+      </form>
+      <p id="add-error" class="error hidden"></p>
+    </section>
+
+    <section class="controls">
+      <button id="refresh-btn" class="secondary-btn">Refresh Now</button>
+      <span id="status-text" class="status-text"></span>
+    </section>
+
+    <div id="nft-grid" class="nft-grid">
+      <div class="empty-state" id="empty-state">
+        <p>No NFTs tracked yet. Paste an OpenSea URL above to get started.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
