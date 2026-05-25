@@ -29,10 +29,15 @@
     <section class="controls">
       <button id="refresh-btn" class="secondary-btn">Run</button>
       <select id="sort-select" class="sort-select">
-        <option value="first_track">First Track</option>
         <option value="highest_bid">Highest Bid</option>
+        <option value="first_track">First Track</option>
         <option value="alphabetical">Alphabetical</option>
       </select>
+      <div class="size-toggle">
+        <button class="size-btn" data-size="small">S</button>
+        <button class="size-btn" data-size="medium">M</button>
+        <button class="size-btn active" data-size="large">L</button>
+      </div>
       <span id="status-text" class="status-text"></span>
     </section>
 

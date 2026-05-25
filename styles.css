@@ -132,12 +132,68 @@ button {
 
 .hidden { display: none !important; }
 
+/* Size toggle */
+.size-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.size-btn {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: none;
+  border-radius: 0;
+  padding: 8px 13px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.size-btn + .size-btn { border-left: 1px solid var(--border); }
+.size-btn:hover { color: var(--text); }
+.size-btn.active { background: var(--accent); color: #fff; }
+
 /* NFT Grid */
 .nft-grid {
   display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.nft-grid.size-small {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.nft-grid.size-medium {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.nft-grid.size-large {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
 }
+
+/* Hide image on small, limit height on medium */
+.size-small .card-image,
+.size-small .card-image-placeholder { display: none; }
+
+.size-medium .card-image { aspect-ratio: 4/3; }
+.size-medium .card-image-placeholder { aspect-ratio: 4/3; font-size: 2rem; }
+
+/* Compact body on small */
+.size-small .card-body { padding: 10px 12px; gap: 6px; }
+.size-medium .card-body { padding: 10px 14px; gap: 8px; }
+
+/* Smaller offer value on small/medium */
+.size-small .offer-value { font-size: 1rem; }
+.size-medium .offer-value { font-size: 1.15rem; }
+
+.size-small .card-name { font-size: 0.85rem; }
+.size-medium .card-name { font-size: 0.9rem; }
 
 .empty-state {
   grid-column: 1 / -1;

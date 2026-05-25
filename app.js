@@ -134,6 +134,22 @@ function renderNfts() {
 
 sortSelect.addEventListener('change', renderNfts);
 
+// Size toggle
+const sizeBtns = document.querySelectorAll('.size-btn');
+
+function applySize(size) {
+  grid.className = `nft-grid size-${size}`;
+  sizeBtns.forEach(b => b.classList.toggle('active', b.dataset.size === size));
+  localStorage.setItem('nft-card-size', size);
+}
+
+sizeBtns.forEach(btn => {
+  btn.addEventListener('click', () => applySize(btn.dataset.size));
+});
+
+// Restore saved size preference (default: large)
+applySize(localStorage.getItem('nft-card-size') || 'large');
+
 let _cachedNfts = [];
 
 async function loadNfts() {
