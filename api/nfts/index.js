@@ -41,10 +41,10 @@ module.exports = async (req, res) => {
 
       if (nft) {
         try {
-          const { offer, currency } = await fetchHighestOffer(
+          const { offer, currency, expires_at } = await fetchHighestOffer(
             parsed.chain, parsed.contract_address, parsed.token_id, meta.collection_name
           );
-          await db.updateOffer(nft.id, offer, currency);
+          await db.updateOffer(nft.id, offer, currency, expires_at);
         } catch (err) {
           console.warn('[offer] Initial fetch failed:', err.message);
         }

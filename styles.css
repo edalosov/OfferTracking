@@ -217,6 +217,15 @@ button {
   color: var(--text-muted);
 }
 
+.card-expires {
+  font-size: 0.75rem;
+  color: var(--warning);
+}
+
+.card-expires.expired {
+  color: var(--danger);
+}
+
 /* Alert threshold */
 .alert-row {
   display: flex;

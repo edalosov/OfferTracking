@@ -18,6 +18,17 @@ function timeAgo(dateStr) {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+function timeUntil(dateStr) {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr).getTime() - Date.now();
+  if (diff <= 0) return 'Expired';
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ${mins % 60}m`;
+  return `${Math.floor(hrs / 24)}d ${hrs % 24}h`;
+}
+
 function formatOffer(value) {
   if (!value || value === 0) return '0';
   if (value < 0.001) return value.toFixed(6);
@@ -52,6 +63,12 @@ function renderCard(nft) {
       </div>
 
       <div class="card-updated">Last checked: ${timeAgo(nft.last_fetched)}</div>
+      ${timeUntil(nft.offer_expires_at)
+        ? `<div class="card-expires ${timeUntil(nft.offer_expires_at) === 'Expired' ? 'expired' : ''}">
+             Offer expires: ${timeUntil(nft.offer_expires_at)}
+           </div>`
+        : ''
+      }
 
       <div class="alert-row">
         <span class="alert-label">Alert at:</span>
