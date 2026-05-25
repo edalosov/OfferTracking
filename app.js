@@ -137,7 +137,7 @@ addForm.addEventListener('submit', async (e) => {
 
 refreshBtn.addEventListener('click', async () => {
   refreshBtn.disabled = true;
-  refreshBtn.textContent = 'Refreshing...';
+  refreshBtn.textContent = 'Running...';
   statusText.textContent = 'Polling OpenSea...';
 
   try {
@@ -146,7 +146,7 @@ refreshBtn.addEventListener('click', async () => {
     setTimeout(loadNfts, 3000);
   } finally {
     refreshBtn.disabled = false;
-    refreshBtn.textContent = 'Refresh Now';
+    refreshBtn.textContent = 'Run';
   }
 });
 
