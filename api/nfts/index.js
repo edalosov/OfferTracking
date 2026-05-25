@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
       if (nft) {
         try {
           const { offer, currency } = await fetchHighestOffer(
-            parsed.chain, parsed.contract_address, parsed.token_id
+            parsed.chain, parsed.contract_address, parsed.token_id, meta.collection_name
           );
           await db.updateOffer(nft.id, offer, currency);
         } catch (err) {
