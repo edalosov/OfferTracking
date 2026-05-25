@@ -30,10 +30,10 @@ function renderCard(nft) {
   card.className = 'nft-card';
   card.dataset.id = nft.id;
 
-  const offerNum = nft.current_highest_offer || 0;
+  const offerNum = parseFloat(nft.current_highest_offer) || 0;
   const offerClass = offerNum === 0 ? 'offer-value zero' : 'offer-value';
   const hasAlert = nft.alert_threshold != null && nft.alert_threshold !== '';
-  const alertActive = hasAlert && offerNum >= nft.alert_threshold;
+  const alertActive = hasAlert && offerNum >= parseFloat(nft.alert_threshold);
 
   card.innerHTML = `
     ${nft.image_url
