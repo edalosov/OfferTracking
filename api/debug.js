@@ -21,10 +21,16 @@ async function probe(url) {
 module.exports = async (req, res) => {
   try {
     const id = parseInt(req.query.id, 10);
-    if (!id) return res.status(400).json({ error: 'Pass ?id=<nft database id>' });
+    if (!id) {
+      const all = await db.getAllNfts();
+      return res.json({ hint: 'Pass ?id=<id>', nfts: all.map(n => ({ id: n.id, name: n.name, collection_slug: n.collection_name })) });
+    }
 
     const nft = await db.getNftById(id);
-    if (!nft) return res.status(404).json({ error: 'NFT not found in database' });
+    if (!nft) {
+      const all = await db.getAllNfts();
+      return res.status(404).json({ error: 'NFT not found', available_ids: all.map(n => ({ id: n.id, name: n.name })) });
+    }
 
     const { chain, contract_address: contract, token_id: tokenId, collection_name: slug } = nft;
     const base = 'https://api.opensea.io/api/v2';
