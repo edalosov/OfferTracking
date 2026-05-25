@@ -5,7 +5,19 @@ const urlInput = document.getElementById('url-input');
 const addBtn = document.getElementById('add-btn');
 const addError = document.getElementById('add-error');
 const refreshBtn = document.getElementById('refresh-btn');
+const sortSelect = document.getElementById('sort-select');
 const statusText = document.getElementById('status-text');
+
+function sortNfts(nfts, order) {
+  const sorted = [...nfts];
+  if (order === 'highest_bid') {
+    sorted.sort((a, b) => parseFloat(b.current_highest_offer) - parseFloat(a.current_highest_offer));
+  } else if (order === 'alphabetical') {
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }
+  // 'first_track' keeps the default created_at DESC order from the server
+  return sorted;
+}
 
 function timeAgo(dateStr) {
   if (!dateStr) return 'Never';
@@ -109,22 +121,28 @@ async function safeJson(res) {
   try { return JSON.parse(text); } catch { throw new Error(text.slice(0, 200)); }
 }
 
+function renderNfts() {
+  grid.querySelectorAll('.nft-card').forEach(c => c.remove());
+  const sorted = sortNfts(_cachedNfts, sortSelect.value);
+  if (sorted.length === 0) {
+    emptyState.classList.remove('hidden');
+  } else {
+    emptyState.classList.add('hidden');
+    sorted.forEach(nft => grid.appendChild(renderCard(nft)));
+  }
+}
+
+sortSelect.addEventListener('change', renderNfts);
+
+let _cachedNfts = [];
+
 async function loadNfts() {
   try {
     const res = await fetch('/api/nfts');
     const data = await safeJson(res);
     if (!res.ok) throw new Error(data.error || res.statusText);
-
-    // Remove old cards, keep empty state
-    grid.querySelectorAll('.nft-card').forEach(c => c.remove());
-
-    if (data.length === 0) {
-      emptyState.classList.remove('hidden');
-    } else {
-      emptyState.classList.add('hidden');
-      data.forEach(nft => grid.appendChild(renderCard(nft)));
-    }
-
+    _cachedNfts = data;
+    renderNfts();
     statusText.textContent = `Last refreshed: ${new Date().toLocaleTimeString()}`;
   } catch (err) {
     statusText.textContent = `Error: ${err.message}`;

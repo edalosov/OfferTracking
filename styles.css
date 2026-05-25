@@ -105,6 +105,20 @@ button {
   margin-bottom: 24px;
 }
 
+.sort-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sort-select:focus { border-color: var(--accent); }
+
 .status-text {
   color: var(--text-muted);
   font-size: 0.85rem;
