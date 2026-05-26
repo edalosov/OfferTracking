@@ -83,7 +83,7 @@ function renderCard(nft) {
       }
 
       <div class="alert-row">
-        <span class="alert-label">Alert at:</span>
+        <span class="alert-label">Alert:</span>
         <input
           type="number"
           class="alert-input"
