@@ -42,10 +42,8 @@ function timeUntil(dateStr) {
 }
 
 function formatOffer(value) {
-  if (!value || value === 0) return '0';
-  if (value < 0.001) return value.toFixed(6);
-  if (value < 1) return value.toFixed(4);
-  return value.toFixed(3);
+  if (!value || value === 0) return '0.00';
+  return value.toFixed(2);
 }
 
 function renderCard(nft) {
@@ -64,6 +62,8 @@ function renderCard(nft) {
       : `<div class="card-image-placeholder">🖼️</div>`
     }
     <div class="card-body">
+      <button class="remove-btn" data-id="${nft.id}" title="Remove">×</button>
+
       <div>
         <div class="card-name" title="${escHtml(nft.name || '')}">${escHtml(nft.name || `#${nft.token_id}`)}</div>
         ${nft.collection_name ? `<div class="card-collection">${escHtml(nft.collection_name)}</div>` : ''}
@@ -97,8 +97,6 @@ function renderCard(nft) {
       </div>
 
       ${alertActive ? `<div class="alert-active">⚡ Offer exceeds your threshold</div>` : ''}
-
-      <button class="remove-btn" data-id="${nft.id}">Remove</button>
     </div>
   `;
 

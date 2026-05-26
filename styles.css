@@ -162,9 +162,14 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
-.nft-grid.size-small {
+.nft-grid.size-xs {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
+}
+
+.nft-grid.size-small {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
 }
 
 .nft-grid.size-medium {
@@ -177,21 +182,30 @@ button {
   gap: 20px;
 }
 
-/* Hide image on small, limit height on medium */
-.size-small .card-image,
-.size-small .card-image-placeholder { display: none; }
+/* XS: no image */
+.size-xs .card-image,
+.size-xs .card-image-placeholder { display: none; }
 
+/* S: small square image */
+.size-small .card-image { aspect-ratio: 1; max-height: 130px; }
+.size-small .card-image-placeholder { aspect-ratio: 1; max-height: 130px; font-size: 2rem; }
+
+/* M: 4/3 image */
 .size-medium .card-image { aspect-ratio: 4/3; }
 .size-medium .card-image-placeholder { aspect-ratio: 4/3; font-size: 2rem; }
 
-/* Compact body on small */
-.size-small .card-body { padding: 10px 12px; gap: 6px; }
+/* Compact body padding */
+.size-xs .card-body     { padding: 10px 12px; gap: 5px; }
+.size-small .card-body  { padding: 10px 12px; gap: 6px; }
 .size-medium .card-body { padding: 10px 14px; gap: 8px; }
 
-/* Smaller offer value on small/medium */
+/* Scale offer value */
+.size-xs .offer-value    { font-size: 0.95rem; }
 .size-small .offer-value { font-size: 1rem; }
 .size-medium .offer-value { font-size: 1.15rem; }
 
+/* Scale name */
+.size-xs .card-name    { font-size: 0.8rem; }
 .size-small .card-name { font-size: 0.85rem; }
 .size-medium .card-name { font-size: 0.9rem; }
 
@@ -244,6 +258,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
 
 .card-name {
@@ -253,6 +268,7 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 24px;
 }
 
 .card-collection {
@@ -344,14 +360,16 @@ button {
 }
 
 .remove-btn {
-  align-self: flex-end;
+  position: absolute;
+  top: 8px;
+  right: 8px;
   background: transparent;
   color: var(--text-muted);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 5px 10px;
-  font-size: 0.78rem;
-  margin-top: auto;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .remove-btn:hover { border-color: var(--danger); color: var(--danger); }
