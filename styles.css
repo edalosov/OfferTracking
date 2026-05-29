@@ -298,6 +298,11 @@ button {
   color: var(--text-muted);
 }
 
+.card-listing {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .card-updated {
   font-size: 0.75rem;
   color: var(--text-muted);

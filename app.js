@@ -73,6 +73,10 @@ function renderCard(nft) {
         <span class="${offerClass}">${formatOffer(offerNum)}</span>
         <span class="offer-currency">${escHtml(nft.offer_currency || 'ETH')}</span>
       </div>
+      ${parseFloat(nft.cheapest_listing) > 0
+        ? `<div class="card-listing">Listed: ${formatOffer(parseFloat(nft.cheapest_listing))} ${escHtml(nft.listing_currency || 'ETH')}</div>`
+        : ''
+      }
 
       <div class="card-updated">Last checked: ${timeAgo(nft.last_fetched)}</div>
       ${timeUntil(nft.offer_expires_at)
